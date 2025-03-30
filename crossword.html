@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Semiconductor Crossword</title>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            text-align: center;
+            background: linear-gradient(to right, #2193b0, #6dd5ed);
+            padding: 20px;
+            color: #fff;
+        }
+        h2 {
+            font-size: 36px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(12, 50px);
+            grid-template-rows: repeat(12, 50px);
+            gap: 5px;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 20px;
+            border-radius: 15px;
+        }
+        input {
+            width: 50px;
+            height: 50px;
+            text-align: center;
+            font-size: 22px;
+            font-weight: bold;
+            border: 2px solid #42a5f5;
+            border-radius: 5px;
+            background-color: #fff;
+            color: #0d47a1;
+        }
+        .correct { background-color: #4caf50; color: white; }
+        .incorrect { background-color: #f44336; color: white; }
+        .hint {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #fff;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 12px;
+            border-radius: 8px;
+            display: inline-block;
+        }
+        .btn {
+            margin-top: 20px;
+            padding: 12px 25px;
+            background: #ff9800;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .btn:hover {
+            background: #e65100;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <h2>Semiconductor Crossword</h2>
+    <div class="grid" id="crossword"></div>
+    <button class="btn" onclick="checkAnswers()">Check Answers</button>
+    <button class="btn" onclick="showHints()">Show Hints</button>
+    <div class="hint" id="hints"></div>
+    <script>
+        const words = [
+            { word: "DIODE", positions: [[0, 0], [0, 1], [0, 2], [0, 3], [0, 4]], hint: "A two-terminal semiconductor device." },
+            { word: "TRANSISTOR", positions: [[2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0], [8, 0], [9, 0], [10, 0], [11, 0]], hint: "Used to amplify or switch signals." },
+            { word: "SILICON", positions: [[4, 2], [4, 3], [4, 4], [4, 5], [4, 6], [4, 7], [4, 8]], hint: "Common material in semiconductor manufacturing." },
+            { word: "MOSFET", positions: [[6, 2], [7, 2], [8, 2], [9, 2], [10, 2], [11, 2]], hint: "A type of transistor used in circuits." },
+            { word: "CAPACITOR", positions: [[8, 4], [8, 5], [8, 6], [8, 7], [8, 8], [8, 9], [8, 10], [8, 11]], hint: "Stores electrical energy." }
+        ];
+        
+        function createCrossword() {
+            const grid = document.getElementById("crossword");
+            for (let r = 0; r < 12; r++) {
+                for (let c = 0; c < 12; c++) {
+                    let input = document.createElement("input");
+                    input.dataset.row = r;
+                    input.dataset.col = c;
+                    input.maxLength = 1;
+                    input.addEventListener("input", checkWordCompletion);
+                    grid.appendChild(input);
+                }
+            }
+            words.forEach(({ word, positions }) => {
+                positions.forEach(([r, c], index) => {
+                    let input = document.querySelector(`input[data-row='${r}'][data-col='${c}']`);
+                    input.style.backgroundColor = "#bbdefb";
+                    if (index === 0) input.value = word[0]; 
+                });
+            });
+        }
+
+        function checkWordCompletion() {
+            words.forEach(({ word, positions }) => {
+                let enteredWord = positions.map(([r, c]) => {
+                    let input = document.querySelector(`input[data-row='${r}'][data-col='${c}']`);
+                    return input.value.toUpperCase();
+                }).join("");
+                
+                if (enteredWord.length === word.length) {
+                    if (enteredWord === word) {
+                        alert("Correct! " + word);
+                        positions.forEach(([r, c]) => {
+                            let input = document.querySelector(`input[data-row='${r}'][data-col='${c}']`);
+                            input.classList.add("correct");
+                        });
+                    } else {
+                        alert("Wrong! Try again.");
+                    }
+                }
+            });
+        }
+        
+        function checkAnswers() {
+            words.forEach(({ word, positions }) => {
+                let enteredWord = positions.map(([r, c]) => document.querySelector(`input[data-row='${r}'][data-col='${c}']`).value.toUpperCase()).join("");
+                if (enteredWord === word) {
+                    positions.forEach(([r, c]) => {
+                        document.querySelector(`input[data-row='${r}'][data-col='${c}']`).classList.add("correct");
+                    });
+                } else {
+                    positions.forEach(([r, c]) => {
+                        document.querySelector(`input[data-row='${r}'][data-col='${c}']`).classList.add("incorrect");
+                    });
+                }
+            });
+        }
+        
+        function showHints() {
+            const hintDiv = document.getElementById("hints");
+            hintDiv.innerHTML = "<b>Hints:</b><br>" + words.map(({ hint }) => `- ${hint}`).join("<br>");
+        }
+
+        createCrossword();
+    </script>
+</body>
+</html>
